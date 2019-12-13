@@ -1,16 +1,31 @@
-<h1>Articles from Science Daily!</h1>
+<div class="container">
 
-<ul>
+<div class="jumbotron">
+<h1>Articles from Science Daily!</h1>
+</div>
+
+
+<div class="row"> 
+    <div class="col-2"></div>
+    <div class="col-8">
   {{#each articles}}
+  {{!-- <div class="well"> --}}
     {{!-- {{#unless sleepy}} --}}
-    <li> Title: {{title}}
-      {{> articles/article-block}}
+    Title: {{title}}
+    <p class="link">Link: {{link}}</p>
+    <p class="summary">Summary: {{summary}}</p>
+    </div>
+
+      {{!-- {{> articles/article-block}} --}}
     {{!-- {{/unless}} --}}
-    </li>
+    
   {{/each}}
-</ul>
+{{!-- </div> --}}
+</div>
 
 <h2></h2>
+
+</div>
 
 {{!-- <ul>
   {{#each cats}}

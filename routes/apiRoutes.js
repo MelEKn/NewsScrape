@@ -29,12 +29,12 @@ module.exports = function (app) {
             else {
                 var handleArticles = {
                     articles: found
-                } 
+                }
                 res.render("index", handleArticles);
             }
         });
-    //    res.send("Hello world");
-    
+        //    res.send("Hello world");
+
     });
 
 
@@ -59,11 +59,11 @@ module.exports = function (app) {
     });
 
 
-  // Route 2
-  // =======
-  // When you visit this route, the server will
-  // scrape data from the site of your choice, and save it to
-  // MongoDB.
+    // Route 2
+    // =======
+    // When you visit this route, the server will
+    // scrape data from the site of your choice, and save it to
+    // MongoDB.
 
     app.get("/scrape", function (req, res) {
         axios.get("https://sciencedaily.com/news/").then(function (response) {
@@ -92,13 +92,25 @@ module.exports = function (app) {
                 result[i] = summary;
 
 
+        //Checks if there's any article by the scraped title in the database. Only insert a new article if it's not found.
+                db.articles.findOne({ "title": title }, function (error, found) {
+                    if (error) {
+                        console.log(error);
+                    }
+                    else {
+                        if (found) {
+                            console.log(found.title + " is already in the database");
+                        } else {
+                            db.articles.insert({ "title": title, "link": link, "summary": summary });
+                            console.log(title + " has been added to the database");
+                        }
+                    }
+                });
 
-                //   result[i].link = $(element).find("a").attr("href");
 
-                //  console.log(link);
-                // var summary = $(element).find("p").text();
 
-                db.articles.insert({ "title": title, "link": link, "summary": summary });
+
+
             });
             console.log("result is: ");
             console.log(result);
