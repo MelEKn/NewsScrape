@@ -39,34 +39,6 @@ var models = require("./models");
  require("./routes/htmlRoutes")(app);
 
 
-
-
-// Main route (simple Hello World Message)
-
-
-// Route 1
-// =======
-// This route will retrieve all of the data
-// from the scrapedData collection as a json (this will be populated
-// by the data you scrape using the next route)
-
-
-   
-  // Route 2
-  // =======
-  // When you visit this route, the server will
-  // scrape data from the site of your choice, and save it to
-  // MongoDB.
-  // TIP: Think back to how you pushed website data
-  // into an empty array in the last class. How do you
-  // push it into a MongoDB collection instead?
-  
-
-
-
-
-
-
 // Start our server so that it can begin listening to client requests.
 app.listen(PORT, function () {
     // Log (server-side) when our server has started
