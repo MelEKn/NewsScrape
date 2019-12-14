@@ -13,6 +13,10 @@ app.use(logger("dev"));
 var databaseUrl = "sciencedailydb";
 var collections = ["articles"];
 
+
+
+
+
 // Hook mongojs configuration to the db variable
 var db = mongojs(databaseUrl, collections);
 db.on("error", function (error) {
