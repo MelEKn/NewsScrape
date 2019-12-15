@@ -26,7 +26,8 @@ db.on("error", function (error) {
 module.exports = function (app) {
     app.get("/", function (req, res) {
 
-        db.articles.find({}, function (error, found) {
+
+        db.articles.find({}).sort({ _id: -1 }, function (error, found) {
             if (error) {
                 console.log(error);
             }
