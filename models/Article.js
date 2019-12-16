@@ -26,11 +26,11 @@ var ArticleSchema = new Schema({
     required: true
   },
   //"articleID" is required, unique, and a number
-  articleID: {
-    type: Number,
-    required: true,
-    unique: true
-  },
+  // articleID: {
+  //   type: Number,
+  //   required: true,
+  //   unique: true
+  // },
   selected: {
     type: Boolean,
     default: false

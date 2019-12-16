@@ -3,44 +3,36 @@ var mongojs = require("mongojs");
 var logger = require("morgan");
 var axios = require("axios");
 var cheerio = require("cheerio");
+var db = require("../models");
 
 // Initialize Express
 var app = express();
 app.use(logger("dev"));
 
 
-// Database configuration
-var databaseUrl = "sciencedailydb";
-var collections = ["articles", "notes"];
-
-
-
-
 
 // Hook mongojs configuration to the db variable
-var db = mongojs(databaseUrl, collections);
-db.on("error", function (error) {
-    console.log("Database Error:", error);
-});
+// var db = mongojs(databaseUrl, collections);
+// db.on("error", function (error) {
+//     console.log("Database Error:", error);
+// });
 
 module.exports = function (app) {
     app.get("/", function (req, res) {
 
 
-        db.articles.find({}).sort({ articleID: -1 }).limit(15, function (error, found) {
-            if (error) {
-                console.log(error);
+        db.Article.find({}).sort({ articleID: -1 }).limit(15).then(function (found) {
+            var handleArticles = {
+                articles: found
             }
-            else {
-                var handleArticles = {
-                    articles: found
-                }
-                res.render("index", handleArticles);
-            }
-        });
-        //    res.send("Hello world");
-
+            res.render("index", handleArticles);
+        })
+            .catch(function (err) {
+                res.json(err);
+            })
     });
+
+
 
 
 
@@ -52,15 +44,12 @@ module.exports = function (app) {
 
     app.get("/displayJSON", function (req, res) {
 
-        db.articles.find({}, function (error, found) {
-            if (error) {
-                console.log(error);
-            }
-            else {
-                res.json(found);
-            }
-        });
-
+        db.Article.find({}).then(function (found) {
+            res.json(found);
+        })
+            .catch(function (err) {
+                res.json(err);
+            });
     });
 
 
@@ -73,42 +62,34 @@ module.exports = function (app) {
     app.get("/scrape", function (req, res) {
         axios.get("https://sciencedaily.com/news/").then(function (response) {
             var $ = cheerio.load(response.data);
-            var result = [];
-            var toDatabase = [];
-            let articlesInDb;
-            //  $("#featured_shorts li").each(function (i, element) {
+            //     var result = [];
+            //     var toDatabase = [];
+            //     let articlesInDb;
+            //     //  $("#featured_shorts li").each(function (i, element) {
 
-            db.articles.find({}, function (error, found) {
-                if (error) {
-                    // console.log("There is an error");
-                    // console.log("WHy isn't this running???")
-                    console.log(error);
-                    articlesInDb = found.length || 0;
-                }
-                else {
-                    //  res.json(found);
-                    console.log("Why isn't this running???")
-                    console.log("found.length is " + found.length);
-                    articlesInDb = found.length;
-                    organizeScrapedData(articlesInDb);
-                }
-            });
+            //     db.articles.find({}, function (error, found) {
+            //         if (error) {
+            //             // console.log("There is an error");
+            //             // console.log("WHy isn't this running???")
+            //             console.log(error);
+            //             articlesInDb = found.length || 0;
+            //         }
+            //         else {
+            //             //  res.json(found);
+            //             console.log("Why isn't this running???")
+            //             console.log("found.length is " + found.length);
+            //             articlesInDb = found.length;
+            //             organizeScrapedData(articlesInDb);
+            //         }
+            //     });
 
-         function organizeScrapedData(articlesInDb){
+            //  function organizeScrapedData(articlesInDb){
 
-           $("#featured_blurbs .tab-pane").each(function (i, element) {
+            $("#featured_blurbs .tab-pane").each(function (i, element) {
                 console.log(i);
-                console.log("articlesInDb is " + articlesInDb);
-
-               // console.log(element);
+                // console.log("articlesInDb is " + articlesInDb);
 
 
-
-                //  console.log(element);
-
-                //    result[i].title = $(element).find("a").html();
-                // console.log(title);
-                // console.log("---");
 
                 var title = $(element).find(".latest-head").text();
                 var link = "https://www.sciencedaily.com" + $(element).find("a").attr("href");
@@ -120,96 +101,94 @@ module.exports = function (app) {
 
                 summary = summary[0];
 
-                result[i] = {
+                var result = {
                     title: title,
                     link: link,
                     date: date,
                     summary: summary
                 }
+                db.Article.create(result);
 
 
 
                 //Checks if there's any article by the scraped title in the database. Only insert a new article if it's not found.
-                db.articles.findOne({ "title": title }, function (error, found) {
-                    if (error) {
-                        console.log(error);
-                    }
-                    else {
-                        if (found) {
-                            console.log(found.title + " is already in the database");
+                //     db.articles.findOne({ "title": title }, function (error, found) {
+                //         if (error) {
+                //             console.log(error);
+                //         }
+                //         else {
+                //             if (found) {
+                //                 console.log(found.title + " is already in the database");
 
-                        } else {
-                            toDatabase.push(result[i]); 
+                //             } else {
+                //                 toDatabase.push(result[i]); 
 
-                            //The ID of the first (ie, most recent) article is given the highest number, so that later it can be displayed to the user from the highest ID to the lowest, which will be the newest to the oldest. 
-                            //It will be organized high to low because the articles already in the database already have lower numbers. 
+                //                 //The ID of the first (ie, most recent) article is given the highest number, so that later it can be displayed to the user from the highest ID to the lowest, which will be the newest to the oldest. 
+                //                 //It will be organized high to low because the articles already in the database already have lower numbers. 
 
-                            let articleID = articlesInDb + (10 - i);
-                            console.log("articleID is " + articleID);
-                        //    console.log(toDatabase);
-                        //    console.log("articlesInDb is " + articlesInDb);
-                         //   console.log("result.length is " + result.length);
-                         //   console.log("toDatabase.length is " + toDatabase.length);
-                            db.articles.insert({ "title": title, "link": link, "date": date, "summary": summary , "articleID": articleID});
-                            console.log(title + "has been added to the database");
-                            if(i===0){
-                                
-                                db.articles.update({"newest": true}, {$set: {"newest": false}} );
-                                db.articles.update({"title": result[0].title}, {$set: {"newest": true}});
-                            }
+                //                 let articleID = articlesInDb + (10 - i);
+                //                 console.log("articleID is " + articleID);
+
+                //                 db.articles.insert({ "title": title, "link": link, "date": date, "summary": summary , "articleID": articleID});
+                //                 console.log(title + "has been added to the database");
+                //                 if(i===0){
+
+                //                     db.articles.update({"newest": true}, {$set: {"newest": false}} );
+                //                     db.articles.update({"title": result[0].title}, {$set: {"newest": true}});
+                //                 }
 
 
 
 
-                           
 
-                        }
-                    }
-                });
 
-   
+                //             }
+                //         }
+                //     });
+
+
+                // });
+
+
+
+
+                // let articleID = articlesInDb + toDatabase.length;
+                // //  for(let i = (articlesInDb + 1); 
+                // console.log("Is THIS running???")
+                //  for(let i=0; i<toDatabase.length; i++){
+                //      db.articles.insert({ "title": result[i].title, "link": result[i].link, "summary": result[i].summary , "articleID": articleID});
+                //      articleID--;
+                // console.log(title + " has been added to the database");
+                //  }
+                // console.log("result is: ");
+                // console.log(result);
+
+
             });
-
-
-
-            
-            // let articleID = articlesInDb + toDatabase.length;
-            // //  for(let i = (articlesInDb + 1); 
-            // console.log("Is THIS running???")
-            //  for(let i=0; i<toDatabase.length; i++){
-            //      db.articles.insert({ "title": result[i].title, "link": result[i].link, "summary": result[i].summary , "articleID": articleID});
-            //      articleID--;
-            // console.log(title + " has been added to the database");
-            //  }
-            // console.log("result is: ");
-            // console.log(result);
-            res.send("Scraped!");
-    } 
         });
+        res.send("Scraped!");
     });
 
-    app.post("/articles/:id", function(req, res) {
+    app.post("/articles/:id", function (req, res) {
         var condition = "id = " + req.params.id;
-      
+
         console.log("condition", condition);
         console.log("req is ");
         console.log(req);
 
-        db.notes.insert({"title": req.body.title, "body": req.body.body}, function (error, notesdb) {
-            if (error){
-                console.log(error);
-            }
-            else{
-            return db.articles.update({_id: req.params.id}, { $push: {"notes": notesdb._id}});
-            }
-        });
+        db.Note.create({ "title": req.body.title, "body": req.body.body }).then(function (notesdb) {
+            return db.Article.findOneAndUpdate({ _id: req.params.id }, { $push: { "notes": notesdb._id } });
+
+        }).catch(function (err) {
+            console.log(err);
+        })
         // .then(function(articlesdb) {
         //     res.json(articlesdb);
         // }).catch(function (err){
         //     res.json(err);
         // })
-      
-      
+
+
         // //   function(result) {
         // //   if (result.changedRows == 0) {
         // //     // If no rows were changed, then the ID must not exist, so 404
@@ -218,7 +197,8 @@ module.exports = function (app) {
         // //     res.status(200).end();
         //   }
         // });
-      });
+    });
+
 
 
 
