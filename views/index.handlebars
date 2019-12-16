@@ -5,13 +5,14 @@
   </div>
 
   <div class="container">
+    <h6 class="text-right"></h6>
     <ol>
       {{#each articles}}
       <div class="row">
         {{!-- <div class="col-1"><li></div> --}}
         <div class="col-8">
           <li>
-            <div class="card mt-3">
+            <div class="card mt-3 article">
 
               {{!-- <div class="well"> --}}
               {{!-- {{#unless sleepy}} --}}
@@ -30,8 +31,10 @@
         </div>
 
         <div class="col-4"> 
-          {{#if 'articleID > 19'}}
-          <p>Notes here</p>
+          {{#if selected}}
+          <div class="notes card">
+          <div>Notes</div>
+          </div>
           {{/if}}
         </div>
       </div>

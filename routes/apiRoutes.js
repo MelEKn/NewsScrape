@@ -152,6 +152,12 @@ module.exports = function (app) {
                          //   console.log("toDatabase.length is " + toDatabase.length);
                             db.articles.insert({ "title": title, "link": link, "date": date, "summary": summary , "articleID": articleID});
                             console.log(title + "has been added to the database");
+                            if(i===0){
+                                
+                                db.articles.update({"newest": true}, {$set: {"newest": false}} );
+                                db.articles.update({"title": result[0].title}, {$set: {"newest": true}});
+                            }
+
 
 
 
@@ -177,7 +183,7 @@ module.exports = function (app) {
             //  }
             // console.log("result is: ");
             // console.log(result);
-     //       res.send("Scraped!");
+            res.send("Scraped!");
     } 
         });
     });
