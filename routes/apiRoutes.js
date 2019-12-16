@@ -27,7 +27,7 @@ module.exports = function (app) {
     app.get("/", function (req, res) {
 
 
-        db.articles.find({}).sort({ _id: -1 }, function (error, found) {
+        db.articles.find({}).sort({ articleID: -1 }, function (error, found) {
             if (error) {
                 console.log(error);
             }
@@ -80,8 +80,8 @@ module.exports = function (app) {
 
             db.articles.find({}, function (error, found) {
                 if (error) {
-                    console.log("There is an error");
-                    console.log("WHy isn't this running???")
+                    // console.log("There is an error");
+                    // console.log("WHy isn't this running???")
                     console.log(error);
                     articlesInDb = found.length || 0;
                 }
@@ -90,10 +90,13 @@ module.exports = function (app) {
                     console.log("Why isn't this running???")
                     console.log("found.length is " + found.length);
                     articlesInDb = found.length;
+                    organizeScrapedData(articlesInDb);
                 }
             });
 
-            $("#featured_blurbs .tab-pane").each(function (i, element) {
+         function organizeScrapedData(articlesInDb){
+
+           $("#featured_blurbs .tab-pane").each(function (i, element) {
                 console.log(i);
                 console.log("articlesInDb is " + articlesInDb);
 
@@ -134,10 +137,19 @@ module.exports = function (app) {
 
                         } else {
                             toDatabase.push(result[i]); 
-                            console.log(toDatabase);
-                            console.log("articlesInDb is " + articlesInDb);
-                            console.log("result.length is " + result.length);
-                            console.log("toDatabase.length is " + toDatabase.length);
+
+                            //The ID of the first (ie, most recent) article is given the highest number, so that later it can be displayed to the user from the highest ID to the lowest, which will be the newest to the oldest. 
+                            //It will be organized high to low because the articles already in the database already have lower numbers. 
+
+                            let articleID = articlesInDb + (10 - i);
+                            console.log("articleID is " + articleID);
+                        //    console.log(toDatabase);
+                        //    console.log("articlesInDb is " + articlesInDb);
+                         //   console.log("result.length is " + result.length);
+                         //   console.log("toDatabase.length is " + toDatabase.length);
+                            db.articles.insert({ "title": title, "link": link, "summary": summary , "articleID": articleID});
+                            console.log(title + "has been added to the database");
+
 
 
                            
@@ -146,27 +158,24 @@ module.exports = function (app) {
                     }
                 });
 
-                
-
-               
-
-
-
-
-
+   
             });
+
+
+
             
-            let articleID = articlesInDb + toDatabase.length;
-            //  for(let i = (articlesInDb + 1); 
-            console.log("Is THIS running???")
-             for(let i=0; i<toDatabase.length; i++){
-                 db.articles.insert({ "title": result[i].title, "link": result[i].link, "summary": result[i].summary , "articleID": articleID});
-                 articleID--;
-            console.log(title + " has been added to the database");
-             }
-            console.log("result is: ");
-            console.log(result);
+            // let articleID = articlesInDb + toDatabase.length;
+            // //  for(let i = (articlesInDb + 1); 
+            // console.log("Is THIS running???")
+            //  for(let i=0; i<toDatabase.length; i++){
+            //      db.articles.insert({ "title": result[i].title, "link": result[i].link, "summary": result[i].summary , "articleID": articleID});
+            //      articleID--;
+            // console.log(title + " has been added to the database");
+            //  }
+            // console.log("result is: ");
+            // console.log(result);
      //       res.send("Scraped!");
+    } 
         });
     });
 
