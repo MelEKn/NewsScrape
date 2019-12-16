@@ -74,9 +74,30 @@ module.exports = function (app) {
         axios.get("https://sciencedaily.com/news/").then(function (response) {
             var $ = cheerio.load(response.data);
             var result = [];
+            var toDatabase = [];
+            let articlesInDb;
             //  $("#featured_shorts li").each(function (i, element) {
 
+            db.articles.find({}, function (error, found) {
+                if (error) {
+                    console.log("There is an error");
+                    console.log("WHy isn't this running???")
+                    console.log(error);
+                    articlesInDb = found.length || 0;
+                }
+                else {
+                    //  res.json(found);
+                    console.log("Why isn't this running???")
+                    console.log("found.length is " + found.length);
+                    articlesInDb = found.length;
+                }
+            });
+
             $("#featured_blurbs .tab-pane").each(function (i, element) {
+                console.log(i);
+                console.log("articlesInDb is " + articlesInDb);
+
+               // console.log(element);
 
 
 
@@ -94,10 +115,15 @@ module.exports = function (app) {
 
                 summary = summary[0];
 
-                result[i] = summary;
+                result[i] = {
+                    title: title,
+                    link: link,
+                    summary: summary
+                }
 
 
-        //Checks if there's any article by the scraped title in the database. Only insert a new article if it's not found.
+
+                //Checks if there's any article by the scraped title in the database. Only insert a new article if it's not found.
                 db.articles.findOne({ "title": title }, function (error, found) {
                     if (error) {
                         console.log(error);
@@ -105,21 +131,42 @@ module.exports = function (app) {
                     else {
                         if (found) {
                             console.log(found.title + " is already in the database");
+
                         } else {
-                            db.articles.insert({ "title": title, "link": link, "summary": summary });
-                            console.log(title + " has been added to the database");
+                            toDatabase.push(result[i]); 
+                            console.log(toDatabase);
+                            console.log("articlesInDb is " + articlesInDb);
+                            console.log("result.length is " + result.length);
+                            console.log("toDatabase.length is " + toDatabase.length);
+
+
+                           
+
                         }
                     }
                 });
+
+                
+
+               
 
 
 
 
 
             });
+            
+            let articleID = articlesInDb + toDatabase.length;
+            //  for(let i = (articlesInDb + 1); 
+            console.log("Is THIS running???")
+             for(let i=0; i<toDatabase.length; i++){
+                 db.articles.insert({ "title": result[i].title, "link": result[i].link, "summary": result[i].summary , "articleID": articleID});
+                 articleID--;
+            console.log(title + " has been added to the database");
+             }
             console.log("result is: ");
             console.log(result);
-            res.send("Scraped!");
+     //       res.send("Scraped!");
         });
     });
 
