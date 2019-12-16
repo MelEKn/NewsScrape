@@ -11,7 +11,7 @@ app.use(logger("dev"));
 
 // Database configuration
 var databaseUrl = "sciencedailydb";
-var collections = ["articles"];
+var collections = ["articles", "notes"];
 
 
 
@@ -188,7 +188,37 @@ module.exports = function (app) {
         });
     });
 
+    app.post("/articles/:id", function(req, res) {
+        var condition = "id = " + req.params.id;
+      
+        console.log("condition", condition);
+        console.log("req is ");
+        console.log(req);
 
+        db.notes.insert({"title": req.body.title, "body": req.body.body}, function (error, notesdb) {
+            if (error){
+                console.log(error);
+            }
+            else{
+            return db.articles.update({_id: req.params.id}, { $push: {"notes": notesdb._id}});
+            }
+        });
+        // .then(function(articlesdb) {
+        //     res.json(articlesdb);
+        // }).catch(function (err){
+        //     res.json(err);
+        // })
+      
+      
+        // //   function(result) {
+        // //   if (result.changedRows == 0) {
+        // //     // If no rows were changed, then the ID must not exist, so 404
+        // //     return res.status(404).end();
+        // //   } else {
+        // //     res.status(200).end();
+        //   }
+        // });
+      });
 
 
 
