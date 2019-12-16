@@ -1,0 +1,14 @@
+body{
+    margin: 0;
+    padding: 0;
+    background-color: #efee37;
+    /* font-family: Georgia,"Times New Roman",Times,serif; */
+    font-family: Arial,"Helvetica Neue",Helvetica,sans-serif;
+    color: #777777;
+    line-height: 150%;
+    /* background-color: gray;  */
+    background-image: url(../images/sciencebackground6.jpg);
+    background-size: auto;
+    
+   
+}

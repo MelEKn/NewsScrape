@@ -1,40 +1,47 @@
 <div class="container">
 
-    <div class="jumbotron">
-        <h1>Articles from Science Daily!</h1>
-    </div>
+  <div class="jumbotron mt-2">
+    <h1>Articles from Science Daily!</h1>
+  </div>
 
-<div class="container">
-  <ol>
-    {{#each articles}}
-    <div class="row">
-        <div class="col-1"><li></div>
+  <div class="container">
+    <ol>
+      {{#each articles}}
+      <div class="row">
+        {{!-- <div class="col-1"><li></div> --}}
         <div class="col-8">
-            <div class="card">
+          <li>
+            <div class="card mt-3">
 
-                {{!-- <div class="well"> --}}
-                {{!-- {{#unless sleepy}} --}}
-                <div class="title"> Title: {{title}} </div>
-                <div class="link">Link: {{link}}</div>
-                <div class="summary">Summary: {{summary}}</div>
+              {{!-- <div class="well"> --}}
+              {{!-- {{#unless sleepy}} --}}
+              <div class="title"> <h5> <a href="{{link}}"> {{title}} </a></h5> </div>
+              {{!-- <div class="link">Link: {{link}}</div> --}}
+              <div class="date">{{date}}</div>
+              <div class="summary"> {{summary}}</div>
 
 
-                {{!-- {{> articles/article-block}} --}}
-                {{!-- {{/unless}} --}}
-            
+              {{!-- {{> articles/article-block}} --}}
+              {{!-- {{/unless}} --}}
+
+            </div>
+          </li>
+
         </div>
-        </li>
 
-</div>
+        <div class="col-4"> 
+          {{#if 'articleID > 19'}}
+          <p>Notes here</p>
+          {{/if}}
+        </div>
+      </div>
 
-    </div>
-
-    {{/each}}
+      {{/each}}
     </ol>
 
-</div>
+  </div>
 
-{{!-- <ul>
+  {{!-- <ul>
   {{#each cats}}
     {{#if sleepy}}
       {{> cats/cat-block sleep=false}}
