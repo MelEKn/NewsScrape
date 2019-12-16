@@ -17,10 +17,19 @@ var ArticleSchema = new Schema({
     type: String,
     required: true
   },
+  date: {
+    type: String
+  },
   //"summary" is required and of type String
   summary: {
     type: String,
     required: true
+  },
+  //"articleID" is required, unique, and a number
+  articleID: {
+    type: Number,
+    required: true,
+    unique: true
   },
   // `notes` is an object that stores a Note id
   // The ref property links the ObjectId to the Note model
