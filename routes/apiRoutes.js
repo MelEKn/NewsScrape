@@ -27,7 +27,7 @@ module.exports = function (app) {
     app.get("/", function (req, res) {
 
 
-        db.articles.find({}).sort({ articleID: -1 }, function (error, found) {
+        db.articles.find({}).sort({ articleID: -1 }).limit(15, function (error, found) {
             if (error) {
                 console.log(error);
             }
@@ -114,6 +114,8 @@ module.exports = function (app) {
                 var link = "https://www.sciencedaily.com" + $(element).find("a").attr("href");
                 var summary = $(element).find(".latest-summary").text().trim();
 
+                var date = summary.substring(0, 13);
+
                 summary = summary.slice(16).split("read more");
 
                 summary = summary[0];
@@ -121,6 +123,7 @@ module.exports = function (app) {
                 result[i] = {
                     title: title,
                     link: link,
+                    date: date,
                     summary: summary
                 }
 
@@ -147,7 +150,7 @@ module.exports = function (app) {
                         //    console.log("articlesInDb is " + articlesInDb);
                          //   console.log("result.length is " + result.length);
                          //   console.log("toDatabase.length is " + toDatabase.length);
-                            db.articles.insert({ "title": title, "link": link, "summary": summary , "articleID": articleID});
+                            db.articles.insert({ "title": title, "link": link, "date": date, "summary": summary , "articleID": articleID});
                             console.log(title + "has been added to the database");
 
 
