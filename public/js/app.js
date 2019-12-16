@@ -5,17 +5,26 @@ $(document).on("click", ".article", function() {
     console.log("On click worked");
     // Save the id from the p tag
     var thisId = $(this).attr("data-id");
+
+    console.log("thisId is " + thisId);
   
     // Now make an ajax call for the Article
     $.ajax({
       method: "GET",
-      url: "/articles/" + thisId
+      url: "/displayJSON"
     })
       // With that done, add the note information to the page
       .then(function(data) {
         console.log(data);
+        let selectedArticle = {};
+        for(let i=0; i<data.length;i++){
+            if(data[i]._id === thisId){
+                selectedArticle = data[i];
+                selectedArticle.selected = true;
+            }
+        }
         // The title of the article
-        $(".notes").append("<h2>" + data.title + "</h2>");
+        $(".notes").append("<h2>" + selectedArticle.title + "</h2>");
         // An input to enter a new title
         $(".notes").append("<input id='titleinput' name='title' >");
         // A textarea to add a new note body
